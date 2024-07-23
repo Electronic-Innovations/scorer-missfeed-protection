@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="MAIN" Id="{c614d13b-9090-4769-9bff-2180d12a1604}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	iCycleCount : INT;
+	cycleTrigger : Tc2_Standard.R_TRIG;
+	
+	shiftRegister : WORD := 0;
+	shiftInput : BOOL;
+	
+	coverFrontEdge : Tc2_Standard.R_TRIG;
+	coverBackEdge : Tc2_Standard.F_TRIG;
+	
+	camFrontEdge : Tc2_Standard.R_TRIG;
+	camBackEdge : Tc2_Standard.F_TRIG;
+	
+	state : StateType := StateType.S0_SHEET_NOT_EXPECTED;
+	nextState : StateType := StateType.S0_SHEET_NOT_EXPECTED;
+	first : BOOL := TRUE;
+	
+	resetTimer : TON;
+	fault: BOOL := FALSE;
+	
+	flasher : TON;
+	
+	i : INT := 0;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Every cycle we need to see if there is a cover sheet being loaded
+// It takes 3 cycles for a cover sheet to get to the scorer
+// If there is a cover sheet in the scorer we need to check
+// 		- that there is a sheet there during the first pulse
+//		- that there isn't a sheet present during the second pulse
+// At all other times we shouldn't see a sheet in the scorer for either pulse
+
+Global.bCoverSheetDetected := NOT Global.bCoverFeedNoSheet;
+
+cycleTrigger(CLK := Global.bCycleTrigger);
+coverFrontEdge(CLK := Global.bScorerSheetDetected);
+coverBackEdge(CLK := Global.bScorerSheetDetected);
+camFrontEdge(CLK := Global.bScorerCam);
+camBackEdge(CLK := Global.bScorerCam);
+
+resetTimer(IN := fault, PT := T#1S);
+flasher(IN := NOT flasher.Q, PT := T#250MS);
+
+IF cycleTrigger.Q THEN
+	iCycleCount := iCycleCount + 1;
+	shiftRegister := SHL(shiftRegister, 1);
+	shiftRegister.0 := Global.bCoverSheetDetected;
+END_IF;
+
+CASE state OF
+	StateType.S0_SHEET_NOT_EXPECTED:
+		IF first THEN
+			fault := FALSE;
+		END_IF
+		
+		IF shiftRegister.1 THEN
+			nextState := StateType.S1_SHEET_SEARCH;
+			ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S0 -> S1', strArg := '');
+		ELSIF coverFrontEdge.Q AND NOT shiftRegister.0 THEN
+			nextState := StateType.S8_FAULT;
+			ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S0 -> S8', strArg := '');
+		END_IF
+		
+	StateType.S1_SHEET_SEARCH:
+		IF camFrontEdge.Q THEN
+			IF Global.bScorerSheetDetected THEN
+				nextState := StateType.S2_BREAK_SEARCH;
+				ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S1 -> S2', strArg := '');
+			ELSE
+				nextState := StateType.S8_FAULT;
+				ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S1 -> S8', strArg := '');
+			END_IF
+		END_IF
+		
+	StateType.S2_BREAK_SEARCH:
+		IF camFrontEdge.Q THEN
+			IF NOT Global.bScorerSheetDetected THEN
+				nextState := StateType.S3_BREAK_COMPLETE;
+				ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S2 -> S3', strArg := '');
+			ELSE
+				nextState := StateType.S8_FAULT;
+				ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S2 -> S8', strArg := '');
+			END_IF
+		END_IF
+	
+	StateType.S3_BREAK_COMPLETE:
+		IF camBackEdge.Q THEN
+			IF NOT Global.bScorerSheetDetected THEN
+				nextState := StateType.S4_CYCLE_COMPLETE;
+				ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S3 -> S4', strArg := '');
+			ELSE
+				nextState := StateType.S8_FAULT;
+				ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S3 -> S8', strArg := '');
+			END_IF
+		END_IF
+	
+	StateType.S4_CYCLE_COMPLETE:
+		IF cycleTrigger.Q THEN
+			nextState := StateType.S0_SHEET_NOT_EXPECTED;
+			ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S4 -> S0', strArg := '');
+		END_IF
+		
+	StateType.S8_FAULT:
+		Global.bMisfeedAlarm := TRUE;
+		fault := TRUE;
+		IF flasher.Q THEN
+			Global.bMisfeedAlarm2 := TRUE;
+		ELSE
+			Global.bMisfeedAlarm2 := FALSE;
+		END_IF
+		IF resetTimer.Q THEN
+			Global.bMisfeedAlarm := FALSE;
+			Global.bMisfeedAlarm2 := FALSE;
+			nextState := StateType.S4_CYCLE_COMPLETE;
+			ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S8 -> S4', strArg := '');
+		END_IF
+END_CASE
+
+IF state <> nextState THEN
+	first := TRUE;
+	state := nextState;
+	FOR i := 32 TO 2 BY -1 DO
+		Global.stateHistory[i] := Global.stateHistory[i - 1];
+	END_FOR
+	Global.stateHistory[1] := state;
+ELSE
+	first := FALSE;
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="MAIN">
+      <LineId Id="2" Count="0" />
+      <LineId Id="6" Count="4" />
+      <LineId Id="118" Count="1" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="46" Count="1" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="165" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="27" Count="1" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="92" Count="3" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="160" Count="0" />
+      <LineId Id="220" Count="0" />
+      <LineId Id="161" Count="0" />
+      <LineId Id="74" Count="0" />
+      <LineId Id="221" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="120" Count="0" />
+      <LineId Id="76" Count="2" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="222" Count="0" />
+      <LineId Id="82" Count="1" />
+      <LineId Id="223" Count="0" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="79" Count="0" />
+      <LineId Id="121" Count="0" />
+      <LineId Id="84" Count="2" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="224" Count="0" />
+      <LineId Id="90" Count="1" />
+      <LineId Id="225" Count="0" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="122" Count="3" />
+      <LineId Id="127" Count="0" />
+      <LineId Id="226" Count="0" />
+      <LineId Id="129" Count="1" />
+      <LineId Id="227" Count="0" />
+      <LineId Id="128" Count="0" />
+      <LineId Id="126" Count="0" />
+      <LineId Id="131" Count="0" />
+      <LineId Id="156" Count="2" />
+      <LineId Id="228" Count="0" />
+      <LineId Id="159" Count="0" />
+      <LineId Id="155" Count="0" />
+      <LineId Id="52" Count="2" />
+      <LineId Id="192" Count="1" />
+      <LineId Id="195" Count="1" />
+      <LineId Id="194" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="96" Count="0" />
+      <LineId Id="133" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="229" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="232" Count="3" />
+      <LineId Id="70" Count="1" />
+      <LineId Id="67" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

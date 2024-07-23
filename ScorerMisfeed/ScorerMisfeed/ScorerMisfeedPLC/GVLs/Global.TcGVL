@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="Global" Id="{8cd62753-4437-4c24-82d7-dc1c470ded86}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	bScorerCam 					AT%I* :BOOL;
+	bScorerSheetDetected		AT%I* :BOOL;
+	bCoverFeedNoSheet		 	AT%I* :BOOL;
+	bCoverSheetDetected		    	  :BOOL;
+	bCycleTrigger 				AT%I* :BOOL;
+	
+	bMisfeedAlarm				AT%Q* :BOOL;
+	bMisfeedAlarm2				AT%Q* :BOOL;
+	
+	stateHistory : ARRAY[1..32] OF INT;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>
