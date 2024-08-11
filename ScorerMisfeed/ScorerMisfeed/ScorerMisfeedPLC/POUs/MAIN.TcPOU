@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
   <POU Name="MAIN" Id="{c614d13b-9090-4769-9bff-2180d12a1604}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
@@ -59,50 +59,41 @@ CASE state OF
 		END_IF
 		
 		IF shiftRegister.1 THEN
-			nextState := StateType.S1_SHEET_SEARCH;
-			ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S0 -> S1', strArg := '');
+			nextState := StateType.S1_SHEET_SEARCH;                   // S0 -> S1
 		ELSIF coverFrontEdge.Q AND NOT shiftRegister.0 THEN
-			nextState := StateType.S8_FAULT;
-			ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S0 -> S8', strArg := '');
+			nextState := StateType.S8_FAULT;                          // S0 -> S8
 		END_IF
 		
 	StateType.S1_SHEET_SEARCH:
 		IF camFrontEdge.Q THEN
 			IF Global.bScorerSheetDetected THEN
-				nextState := StateType.S2_BREAK_SEARCH;
-				ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S1 -> S2', strArg := '');
+				nextState := StateType.S2_BREAK_SEARCH;               // S1 -> S2
 			ELSE
-				nextState := StateType.S8_FAULT;
-				ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S1 -> S8', strArg := '');
+				nextState := StateType.S8_FAULT;                      // S1 -> S8
 			END_IF
 		END_IF
 		
 	StateType.S2_BREAK_SEARCH:
 		IF camFrontEdge.Q THEN
 			IF NOT Global.bScorerSheetDetected THEN
-				nextState := StateType.S3_BREAK_COMPLETE;
-				ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S2 -> S3', strArg := '');
+				nextState := StateType.S3_BREAK_COMPLETE;             // S2 -> S3
 			ELSE
-				nextState := StateType.S8_FAULT;
-				ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S2 -> S8', strArg := '');
+				nextState := StateType.S8_FAULT;                      // S2 -> S8
 			END_IF
 		END_IF
 	
 	StateType.S3_BREAK_COMPLETE:
 		IF camBackEdge.Q THEN
 			IF NOT Global.bScorerSheetDetected THEN
-				nextState := StateType.S4_CYCLE_COMPLETE;
-				ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S3 -> S4', strArg := '');
+				nextState := StateType.S4_CYCLE_COMPLETE;             // S3 -> S4
 			ELSE
-				nextState := StateType.S8_FAULT;
-				ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S3 -> S8', strArg := '');
+				nextState := StateType.S8_FAULT;                      // S3 -> S8
 			END_IF
 		END_IF
 	
 	StateType.S4_CYCLE_COMPLETE:
 		IF cycleTrigger.Q THEN
-			nextState := StateType.S0_SHEET_NOT_EXPECTED;
-			ADSLOGSTR(msgCtrlMask := ADSLOG_MSGTYPE_STRING, msgFmtStr := 'S4 -> S0', strArg := '');
+			nextState := StateType.S0_SHEET_NOT_EXPECTED;             // S4 -> S0
 		END_IF
 		
 	StateType.S8_FAULT:
@@ -154,39 +145,28 @@ END_IF]]></ST>
       <LineId Id="32" Count="0" />
       <LineId Id="92" Count="3" />
       <LineId Id="34" Count="0" />
-      <LineId Id="160" Count="0" />
-      <LineId Id="220" Count="0" />
-      <LineId Id="161" Count="0" />
+      <LineId Id="160" Count="1" />
       <LineId Id="74" Count="0" />
-      <LineId Id="221" Count="0" />
       <LineId Id="51" Count="0" />
       <LineId Id="120" Count="0" />
       <LineId Id="76" Count="2" />
       <LineId Id="80" Count="0" />
-      <LineId Id="222" Count="0" />
       <LineId Id="82" Count="1" />
-      <LineId Id="223" Count="0" />
       <LineId Id="81" Count="0" />
       <LineId Id="79" Count="0" />
       <LineId Id="121" Count="0" />
       <LineId Id="84" Count="2" />
       <LineId Id="88" Count="0" />
-      <LineId Id="224" Count="0" />
       <LineId Id="90" Count="1" />
-      <LineId Id="225" Count="0" />
       <LineId Id="89" Count="0" />
       <LineId Id="87" Count="0" />
       <LineId Id="122" Count="3" />
       <LineId Id="127" Count="0" />
-      <LineId Id="226" Count="0" />
       <LineId Id="129" Count="1" />
-      <LineId Id="227" Count="0" />
       <LineId Id="128" Count="0" />
       <LineId Id="126" Count="0" />
       <LineId Id="131" Count="0" />
-      <LineId Id="156" Count="2" />
-      <LineId Id="228" Count="0" />
-      <LineId Id="159" Count="0" />
+      <LineId Id="156" Count="3" />
       <LineId Id="155" Count="0" />
       <LineId Id="52" Count="2" />
       <LineId Id="192" Count="1" />

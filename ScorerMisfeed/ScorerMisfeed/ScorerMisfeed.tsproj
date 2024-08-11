@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.56">
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.59">
 	<DataTypes>
 		<DataType>
 			<Name GUID="{18071995-0000-0000-0000-00200000000C}" IecBaseType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..11] OF BIT</Name>
@@ -37,7 +37,7 @@
 		</System>
 		<Plc>
 			<Project GUID="{68CA37E1-0A1F-43C5-B45B-3C7A615FC8FD}" Name="ScorerMisfeedPLC" PrjFilePath="ScorerMisfeedPLC\ScorerMisfeedPLC.plcproj" TmcFilePath="ScorerMisfeedPLC\ScorerMisfeedPLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="ScorerMisfeedPLC\ScorerMisfeedPLC.tmc" TmcHash="{5E177CC6-5461-EF50-3CAA-5508DEF0DE8C}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="ScorerMisfeedPLC\ScorerMisfeedPLC.tmc" TmcHash="{1AB302AE-EF91-1DB6-0EB6-1FD08070D0EC}">
 					<Name>ScorerMisfeedPLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
