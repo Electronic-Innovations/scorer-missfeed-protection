@@ -25,6 +25,9 @@ VAR
 	flasher : TON;
 	
 	i : INT := 0;
+	
+	cycleCount : INT := 0;
+	s121Count  : INT := 0; //should be 2x cycle count
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -112,6 +115,15 @@ CASE state OF
 		END_IF
 END_CASE
 
+IF cycleTrigger.Q THEN
+	cycleCount := cycleCount + 1;
+END_IF
+
+IF camFrontEdge.Q THEN
+	s121Count := s121Count + 1;
+END_IF
+
+
 IF state <> nextState THEN
 	first := TRUE;
 	state := nextState;
@@ -179,6 +191,11 @@ END_IF]]></ST>
       <LineId Id="229" Count="0" />
       <LineId Id="60" Count="0" />
       <LineId Id="33" Count="0" />
+      <LineId Id="265" Count="3" />
+      <LineId Id="270" Count="0" />
+      <LineId Id="269" Count="0" />
+      <LineId Id="271" Count="1" />
+      <LineId Id="264" Count="0" />
       <LineId Id="65" Count="0" />
       <LineId Id="64" Count="0" />
       <LineId Id="68" Count="0" />

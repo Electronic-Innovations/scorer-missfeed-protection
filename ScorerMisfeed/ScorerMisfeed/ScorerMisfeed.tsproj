@@ -37,7 +37,7 @@
 		</System>
 		<Plc>
 			<Project GUID="{68CA37E1-0A1F-43C5-B45B-3C7A615FC8FD}" Name="ScorerMisfeedPLC" PrjFilePath="ScorerMisfeedPLC\ScorerMisfeedPLC.plcproj" TmcFilePath="ScorerMisfeedPLC\ScorerMisfeedPLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="ScorerMisfeedPLC\ScorerMisfeedPLC.tmc" TmcHash="{1AB302AE-EF91-1DB6-0EB6-1FD08070D0EC}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="ScorerMisfeedPLC\ScorerMisfeedPLC.tmc" TmcHash="{146B38A5-94B9-45B5-86A4-055AFDE38ACF}">
 					<Name>ScorerMisfeedPLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
