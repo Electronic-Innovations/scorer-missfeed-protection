@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="StateType" Id="{61facaa5-37a1-4977-8714-ac74fd61bbe7}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+{attribute 'to_string'}
+
+TYPE StateType :
+(
+	S0_SHEET_NOT_EXPECTED,
+	S1_SHEET_SEARCH,
+	S2_BREAK_SEARCH,
+	S3_BREAK_COMPLETE,
+	S4_CYCLE_COMPLETE,
+	S8_FAULT
+);
+END_TYPE
+
+// The back of the sheet is a predictable position.
+// Small pulse first, then long pulse
+
+// The sequence is
+// - Cover should be present when short pulse positive edge
+// - Then cover should have negative edge during long pulse
+
+// No sheet expected
+// Waiting for sheet
+// - On cam positive edge check if the sheet is present
+// Waiting for break
+// - On]]></Declaration>
+  </DUT>
+</TcPlcObject>
